@@ -6,10 +6,13 @@ import LoadingSpinner from '@/components/FuelDetails/LoadingSpinner';
 import ErrorDisplay from '@/components/FuelDetails/ErrorDisplay';
 import DashboardHeader from '@/components/FuelDetails/DashboardHeader';
 import SearchAndFilters from '@/components/FuelDetails/SearchAndFilters';
-import FuelTable from '@/components/FuelDetails/FuelTable';
+import FuelTableComplete from '@/components/FuelDetails/FuelTableComplete';
 import SummaryStats from '@/components/FuelDetails/SummaryStats';
 import VehicleDetailModal from '@/components/FuelDetails/VehicleDetailModal';
 import { useFuelGraphData } from '@/hooks/useFuelGraphData';
+import FuelTablePending from './FuelTablePending';
+import FuelTableProcessing from './FuelTableProcessing';
+import { useFuelAlerts } from '@/hooks/useFuelAlerts';
 
 export default function FuelDetailsDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,11 +21,13 @@ export default function FuelDetailsDashboard() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [activeTab, setActiveTab] = useState<"Pending" | "Processing" | "Complete">("Pending");
 
   const { records, isLoading, isError, error, refetch } = useFuelData();
 
+  const { data: alertRecords = [], isLoading: alertsLoading } = useFuelAlerts();
   // For now, pick first sysServiceId to test (later you can loop all)
-  const sysServiceId = records[0]?.sysServiceId;
+  const sysServiceId = records.length > 0 ? records[0].sysServiceId : null;
   const { data: graphData = [] } = useFuelGraphData(
     sysServiceId,
     "2025-08-03 00:00",
@@ -41,6 +46,7 @@ export default function FuelDetailsDashboard() {
       };
     });
   }, [records, graphData]);
+
 
   // 🔹 Filters (use merged records instead of records)
   const filteredData = useMemo(() => {
@@ -61,6 +67,12 @@ export default function FuelDetailsDashboard() {
       return matchesSearch && matchesDate;
     });
   }, [mergedRecords, searchTerm, startDate, endDate]);
+
+  // 🔹 Split data into three
+  const pendingData = useMemo(() => alertRecords.filter((r) => r.status === "Pending"), [alertRecords]);
+  const processingData = useMemo(() => filteredData.filter((r) => r.status === "Processing"), [filteredData]);
+  console.log("procs",processingData)
+  const completeData = useMemo(() => filteredData.filter((r) => r.status === "Completed"), [filteredData]);
 
   const handleExport = () => {
     console.log('Exporting data...');
@@ -90,7 +102,7 @@ export default function FuelDetailsDashboard() {
       <div className="mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <DashboardHeader />
+          <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Controls */}
           <SearchAndFilters
@@ -105,7 +117,29 @@ export default function FuelDetailsDashboard() {
         </div>
 
         {/* Table */}
-        <FuelTable data={filteredData} onVehicleClick={handleVehicleClick} />
+        {activeTab === "Pending" && (
+        <FuelTablePending
+          data={pendingData}
+          onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
+          mode="pending"
+        />
+      )}
+
+        {activeTab === "Processing" && (
+        <FuelTableProcessing
+          data={processingData}
+          onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
+          mode="processing"
+        />
+      )}
+
+      {activeTab === "Complete" && (
+        <FuelTableComplete
+          data={completeData}
+          onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
+          mode="complete"
+        />
+      )}
 
         {/* Summary Stats */}
         <SummaryStats data={filteredData} />

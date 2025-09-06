@@ -8,7 +8,7 @@ interface FuelTableProps {
   onVehicleClick: (record: FuelRecord) => void;
 }
 
-const FuelTable: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
+const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">
@@ -122,4 +122,4 @@ const FuelTable: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
   );
 };
 
-export default FuelTable;
+export default FuelTableProcessing;
