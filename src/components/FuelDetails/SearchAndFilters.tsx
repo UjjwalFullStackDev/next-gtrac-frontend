@@ -61,7 +61,7 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       {/* Export Button */}
       <button
         onClick={onExport}
-        className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        className="flex items-center space-x-2 px-4 py-2 ml-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
       >
         <Download className="w-4 h-4" />
         <span>Export</span>

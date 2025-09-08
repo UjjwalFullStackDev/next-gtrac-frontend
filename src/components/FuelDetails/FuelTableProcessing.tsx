@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
 import StatusBadge from './StatusBadge';
+import { FuelDataModal } from './popupTableComponents/FuelDataModel';
 
 interface FuelTableProps {
   data: FuelRecord[];
   onVehicleClick: (record: FuelRecord) => void;
 }
 
-const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
-  console.log("proc",data)
+const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log("data", data)
+  const handleVehicleClick = (record) => {
+    setSelectedRecord(record);
+    setIsModalOpen(true);
+    console.log("Vehicle clicked:", record);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecord(null);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">
@@ -25,10 +39,10 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
               <th className="p-3 text-left font-semibold text-sm text-gray-700 flex items-center divide-x divide-gray-300">
                 <div className="text-center px-2">
                   <div>(Soft) Reading</div>
-                </div>              
+                </div>
                 <div className="text-center px-2">
                   <div>(App) Reading</div>
-                </div>              
+                </div>
               </th>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Fuel Difference
@@ -61,15 +75,15 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
               <tr key={record.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <button
-                    onClick={() => onVehicleClick(record)}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                    onClick={() => handleVehicleClick(record)}
+                    className="text-black-600 hover:text-blue-800 hover:underline cursor-pointer"
                   >
                     {record.vehicleno}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{record.fuelStatus}</div>
-                  <div className="text-sm text-gray-500">{record.currentReading} liters</div>
+                  <div className="text-sm text-gray-900">Current</div>
+                  <div className="text-sm text-gray-500">{record.requestedFuel} liters</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center divide-x divide-gray-300">
@@ -79,7 +93,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                     </div>
                     <div className="text-center px-4">
                       <div className="text-sm font-medium text-cyan-600">Quantity</div>
-                      <div className="text-sm text-gray-900">{record.rv} liters</div>
+                      <div className="text-sm text-gray-900">{record.liveFuel} liters</div>
                     </div>
                   </div>
                 </td>
@@ -90,10 +104,10 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.pumpLocation}</div>
+                  <div className="whitespace-pre-line">{record.location}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.created_at}</div>
+                  <div className="whitespace-pre-line">{record.fuelDate}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₹{record.softwareReadingTotalAmount || 0}
@@ -112,13 +126,27 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                   Pending
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge status={record.status || 'ok'} />
+                  {record.auditStatus === 'Audit' ? (
+                    <span className="inline-flex items-center justify-center w-full px-6 py-1 rounded-md text-xs font-medium bg-red-700 text-white cursor-pointer">
+                      Audit
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-700 text-white cursor-pointer">
+                      Ok
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <FuelDataModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        record={selectedRecord}
+        refresh={refresh}
+      />
     </div>
   );
 };

@@ -1,36 +1,28 @@
-import { FuelGraphRecord } from '@/types/FuelGraphRecord';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+// hooks/useFuelGraphData.ts
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-export function useFuelGraphData(sysServiceId?: string, startDate?: string, endDate?: string) {
-  const formatDate = (d: Date) =>
-    d.toISOString().slice(0, 16).replace("T", " ");
+export interface FuelGraphRecord {
+  vehReg: string;
+  vId: number;
+  fuel: number;
+  gpsTime: string;
+}
 
-  const today = new Date();
-  const defaultStart = formatDate(new Date(today.setHours(0, 0, 0, 0)));
-  const defaultEnd = formatDate(new Date(today.setHours(23, 59, 59, 999)));
-
-  const start = startDate ?? defaultStart;
-  const end = endDate ?? defaultEnd;
-
+export function useFuelGraphData() {
   return useQuery({
-    queryKey: ["fuelGraphData", sysServiceId, start, end],
-    queryFn: async () => {
-      if (!sysServiceId) return [];
+    queryKey: ["fuelGraphData"],
+    queryFn: async (): Promise<FuelGraphRecord[]> => {
       const res = await axios.get(
-        `https://gtrac.in:8089/trackingDashboard/getAllfueldatagraph`,
-        {
-          params: {
-            sys_service_id: sysServiceId,
-            startdate: start,
-            enddate: end,
-            TypeFT: 1,
-            userid: 833193,
-          },
-        }
+        "https://gtrac.in:8089/trackingDashboard/getListVehiclesmob?token=59961&userid=833193&puserid=1&mode="
       );
-      return res.data ?? [];
+
+      return (res.data.list ?? []).map((item: any) => ({
+        vehReg: item.vehReg,
+        vId: item.vId,
+        fuel: item.gpsDtl?.fuel ?? 0,
+        gpsTime: item.gpsDtl?.gpstime ?? "",
+      }));
     },
-    enabled: !!sysServiceId,
   });
 }

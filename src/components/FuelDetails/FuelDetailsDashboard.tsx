@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useMemo } from 'react';
-import { FuelRecord } from '@/types/FuelRecord';
 import { useFuelData } from '@/hooks/useFuelData';
 import LoadingSpinner from '@/components/FuelDetails/LoadingSpinner';
 import ErrorDisplay from '@/components/FuelDetails/ErrorDisplay';
@@ -19,61 +18,42 @@ export default function FuelDetailsDashboard() {
   const [endDate, setEndDate] = useState('');
   const [activeTab, setActiveTab] = useState<"Pending" | "Processing" | "Complete">("Pending");
 
-  const { records, isLoading, isError, error, refetch } = useFuelData();
+  const { records: fuelLogs = [], isLoading, isError, error, refetch } = useFuelData();
+  const { alerts: alertRecords, isLoading: alertsLoading, acceptAlert, rejectAlert } = useFuelAlerts();
+  const { data: fuelGraphData = [] } = useFuelGraphData();
 
-  const {
-  alerts: alertRecords,
-  isLoading: alertsLoading,
-  acceptAlert,
-  rejectAlert,
-} = useFuelAlerts();
+  const merged = alertRecords.map(alert => {
+  const graph = fuelGraphData.find(g => g.vehReg === alert.vehicleno);
+  const log = fuelLogs.find(l => l.alertBankId === alert.id);
 
-  // For now, pick first sysServiceId to test (later you can loop all)
-  // const sysServiceId = records.length > 0 ? records[0].sysServiceId : null;
-  // const { data: graphData = [] } = useFuelGraphData(
-  //   sysServiceId,
-  //   "2025-08-03 00:00",
-  //   "2025-08-03 16:00"
-  // );
+  // readings
+  const softReading = log?.quantityReading ?? 0;   // software log
+  const liveReading = graph ? Math.round(graph.fuel) : 0; // live GPS reading
 
-  // // 🔹 Merge graph data with fuel records
-  // const mergedRecords = useMemo(() => {
-  //   return records.map((rec) => {
-  //     const extra = graphData.find((g) => g.sysServiceId === rec.sysServiceId);
-  //     return {
-  //       ...rec,
-  //       gpsTime: extra?.gpsTime ?? null,
-  //       rv: extra?.rv ?? null,
-  //       fuelTypeGraph: extra?.fuelType ?? null,
-  //     };
-  //   });
-  // }, [records, graphData]);
+  // calculate percentage difference
+  let fuelDifference = 0;
+  if (softReading > 0 && liveReading > 0) {
+    fuelDifference = ((liveReading - softReading) / softReading) * 100;
+  }
 
+  // set status based on >2% diff
+  const auditStatus = Math.abs(fuelDifference) > 2 ? "Audit" : "OK";
 
-  // // 🔹 Filters (use merged records instead of records)
-  // const filteredData = useMemo(() => {
-  //   return mergedRecords.filter((record: any) => {
-  //     const search = searchTerm.toLowerCase();
-
-  //     const matchesSearch =
-  //       record.ambulanceNumber.toString().toLowerCase().includes(search) ||
-  //       record.pumpLocation.toLowerCase().includes(search) ||
-  //       record.gpsTime?.toLowerCase().includes(search);
-
-  //     const recordDate = new Date(record.rawTime);
-
-  //     const matchesDate =
-  //       (!startDate || recordDate >= new Date(startDate)) &&
-  //       (!endDate || recordDate <= new Date(endDate));
-
-  //     return matchesSearch && matchesDate;
-  //   });
-  // }, [mergedRecords, searchTerm, startDate, endDate]);
+  return {
+    ...alert,
+    ...log, // ✅ log should come after alert so invoiceFileUrl isn’t lost
+    liveFuel: graph ? Math.round(graph.fuel) : null,
+    gpsTime: graph ? graph.gpsTime : null,
+    fuelDifference: Math.round(fuelDifference * 100) / 100,
+    auditStatus,
+    invoiceFileUrl: log?.invoiceFileUrl ?? null, // ✅ explicitly safe
+  };
+});
 
   // 🔹 Split data into three
-  const pendingData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Pending"), [alertRecords]);
-  const processingData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Processing"), [alertRecords]);
-  const completeData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Completed"), [alertRecords]);
+  const pendingData = useMemo(() => merged.filter((r) => r.statusText  === "Pending"), [merged]);
+  const processingData = useMemo(() => merged.filter((r) => r.statusText  === "Processing"), [merged]);
+  const completeData = useMemo(() => merged.filter((r) => r.statusText  === "Completed"), [merged]);
 
   const handleExport = () => {
     console.log('Exporting data...');
@@ -114,6 +94,7 @@ export default function FuelDetailsDashboard() {
           onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
           onAccept={acceptAlert}
           onReject={rejectAlert}
+          refresh={refetch}
           mode="pending"
         />
       )}
@@ -122,6 +103,7 @@ export default function FuelDetailsDashboard() {
         <FuelTableProcessing
           data={processingData}
           onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
+          refresh={refetch}
           mode="processing"
         />
       )}

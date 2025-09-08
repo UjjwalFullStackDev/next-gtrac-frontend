@@ -45,6 +45,7 @@ export const useFuelData = () => {
     return {
       id: r.id,
       sysServiceId: r.ambulance.sysServiceId,
+      alertBankId: r.alertBankId,
       ambulanceNumber: r.ambulance.ambulanceNumber,
       vehicle: r.ambulanceId,
       fuelStatus: r.fuelType,

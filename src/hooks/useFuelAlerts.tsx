@@ -20,23 +20,27 @@ export const useFuelAlerts = () => {
       // status mapping
       let statusText: "Pending" | "Processing" | "Completed" = "Pending";
       if (r.status === 1) statusText = "Processing";
-      if (r.status === 2) statusText = "Completed";
-
+      const parsed = parseMsg(r.msg);
       return {
         ...r,
         statusText,
+        ...parsed
       };
     });
   };
 
   function parseMsg(msg: string) {
-  // Example: "Ambulance DL1A3420 requested fueling at 3 E, ..., with 55.80L fuel"
+  // Extract location
   const locationMatch = msg.match(/fueling at (.*?) with/);
+  // Extract fuel amount
   const fuelMatch = msg.match(/with ([\d.]+)L fuel/);
+  // Extract date (dd-mm-yyyy)
+  const dateMatch = msg.match(/on (\d{2}-\d{2}-\d{4})/);
 
   return {
-    location: locationMatch ? locationMatch[1] : "",
-    requestedFuel: fuelMatch ? parseFloat(fuelMatch[1]) : 0,
+    location: locationMatch ? locationMatch[1].trim() : "",
+    requestedFuel: fuelMatch ? Math.round(parseFloat(fuelMatch[1])) : 0,
+    fuelDate: dateMatch ? dateMatch[1] : "",
   };
 }
 

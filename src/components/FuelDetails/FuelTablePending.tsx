@@ -11,21 +11,16 @@ interface FuelTableProps {
 
 const FuelTablePending: React.FC<FuelTableProps> = ({
   data,
-  onVehicleClick,
   onAccept,
-  onReject
-
+  onReject,
+  refresh
 }) => {
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleVehicleClick = (record) => {
-    console.log("Vehicle clicked:", record);
-  };
-
   const handleAccept = (record) => {
     setSelectedRecord(record);
-    // onAccept(record.id);
+    onAccept(record.id);
     setIsModalOpen(true);
   };
 
@@ -82,17 +77,14 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
             {data.map((record: FuelRecord) => (
               <tr key={record.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <button
-                    onClick={() => onVehicleClick(record)}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
-                  >
+                  <button className="text-black-600">
                     {record.vehicleno}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{record.fuelStatus}</div>
+                  <div className="text-sm text-gray-900">Current</div>
                   <div className="text-sm text-gray-500">
-                    {record.currentReading} liters
+                    {record.requestedFuel} liters
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -109,7 +101,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                       <div className="text-sm font-medium text-cyan-600">
                         Quantity
                       </div>
-                      <div className="text-sm text-gray-900">{record.rv} liters</div>
+                      <div className="text-sm text-gray-900"> liters</div>
                     </div>
                   </div>
                 </td>
@@ -120,10 +112,10 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.pumpLocation || "-"}</div>
+                  <div className="whitespace-pre-line">{record.location || "-"}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.created_at}</div>
+                  <div className="whitespace-pre-line">{record.fuelDate}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₹{record.softwareReadingTotalAmount || 0}
@@ -163,6 +155,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
         isOpen={isModalOpen}
         onClose={closeModal}
         record={selectedRecord}
+        refresh={refresh}
       />
     </div>
   );

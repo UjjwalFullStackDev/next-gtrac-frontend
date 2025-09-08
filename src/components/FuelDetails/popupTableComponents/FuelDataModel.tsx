@@ -2,52 +2,57 @@
 import React, { useState } from 'react';
 import { FileText, X, RefreshCw } from 'lucide-react';
 import { Pill } from './ui/Pill';
-import { useFuelGraphData } from '@/hooks/useFuelGraphData';
 import axios from 'axios';
+import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
 
 
-export const FuelDataModal = ({ isOpen, onClose, record }) => {
+export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
   const [otp, setOtp] = useState("");
   const [payment, setPayment] = useState("Cash");
   const [amount, setAmount] = useState("");
-  const [invoiceReady, setInvoiceReady] = useState(false);
-  const [invoiceUrl, setInvoiceUrl] = useState(null);
-  const [manualReading, setManualReading] = useState(null);
-  const [vehicleno, setVehicleno] = useState(null);
 
-  const sysServiceId = record?.sysServiceId || record?.sys_service_id;
-  const { data: graphData = [] } = useFuelGraphData(sysServiceId);
+  const invoiceUrl = record?.invoice || null;
+  const invoiceReady = !!invoiceUrl;
 
-
-  const handleRefresh = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:5001/api/v1/ambulance/fuel/record/${record.id}`
-      );
-
-      if (res.data.ambulanceFuelLog.length > 0) {
-        setInvoiceUrl(res.data.ambulanceFuelLog[0].invoiceFileUrl);
-        setInvoiceReady(true);
-        setManualReading(res.data.ambulanceFuelLog[0].manualReadingLitres);
-        setVehicleno(res.data.ambulanceFuelLog[0].ambulance.ambulanceNumber)
-      }
-
-      
-      console.log("Refreshed graph data:", graphData);
-    } catch (err) {
-      console.error("Failed to fetch invoice", err);
-      alert("Could not fetch invoice");
-    }
+  const handleRefresh = () => {
+    // just trigger parent refresh (no API call here)
+    if (refresh) refresh();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!otp) {
       alert("Please enter OTP");
       return;
     }
-    console.log("Submitting:", { otp, payment, amount, record });
-    // Handle submission logic here
+    
+    const payload = {
+    alertBankId: record.id,
+    fuelLogId: record.id, 
+    vehicleno: record.vehicleno,
+    location: record.location,
+    requestedFuel: record.requestedFuel,
+    quantityReading: record.quantityReading,
+    liveFuel: record.liveFuel,
+    fuelDifference: record.fuelDifference,
+    status: 'OK',
+    otp,
+    paymentMode: payment,
+    amount,
+    softwareReadingTotalAmount: record.softwareReadingTotalAmount,
+    invoiceFileUrl: record.invoice,
+    gpsTime: record.gpsTime,
+  };
+  
+  try {
+    await axios.post(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/completed`, payload);
+    alert("Transaction submitted successfully!");
+    if (refresh) refresh(); // refresh parent list
     onClose();
+  } catch (err) {
+    console.error("Submit failed", err);
+    alert("Failed to submit");
+  }
+
   };
 
   if (!isOpen || !record) return null;
@@ -124,19 +129,16 @@ export const FuelDataModal = ({ isOpen, onClose, record }) => {
                     <div className="font-semibold text-gray-900">{record.vehicleno}</div>
                   </td>
                   <td className="px-4 py-4 max-w-[220px]">
-                    <div className="text-sm text-gray-900 whitespace-pre-line">{record.pumpLocation}</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      0
-                    </div>
+                    <div className="text-sm text-gray-900 whitespace-pre-line">{record.location || "-"}</div>
                   </td>
                   <td className="px-4 py-4">
-                    <Pill>{record.currentReading} 0L</Pill>
+                    <Pill>{record.requestedFuel || 0} L</Pill>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-gray-900">{manualReading} L</div>
+                    <div className="text-sm font-medium text-gray-900">{record.quantityReading} L</div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-gray-900">{graphData[graphData.length - 1]?.rv} L</div>
+                    <div className="text-sm font-medium text-gray-900">{record.liveFuel} L</div>
                   </td>
                   <td className="px-4 py-4">
                     <span className={
@@ -150,6 +152,7 @@ export const FuelDataModal = ({ isOpen, onClose, record }) => {
                   </td>
                   <td className="px-4 py-4">
                     <input
+                      type="number"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       placeholder="Enter OTP"
@@ -169,14 +172,12 @@ export const FuelDataModal = ({ isOpen, onClose, record }) => {
                   </td>
                   <td className="px-4 py-4">
                     <input
+                      type="number"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       placeholder="₹ Enter amount"
                       className="w-36 rounded-lg border-2 border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
                     />
-                    <div className="text-xs text-gray-500 mt-1">
-                      {record.softwareReadingTotalAmount}
-                    </div>
                   </td>
                   <td className="px-4 py-4">
                     <button
