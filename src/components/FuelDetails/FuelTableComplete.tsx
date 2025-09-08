@@ -9,7 +9,7 @@ interface FuelTableProps {
 }
 
 const FuelTable: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
-  console.log("tableData",data)
+
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">

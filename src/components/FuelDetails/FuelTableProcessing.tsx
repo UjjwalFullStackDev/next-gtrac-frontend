@@ -9,6 +9,7 @@ interface FuelTableProps {
 }
 
 const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick }) => {
+  console.log("proc",data)
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">
@@ -63,7 +64,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                     onClick={() => onVehicleClick(record)}
                     className="text-blue-600 hover:text-blue-800 hover:underline"
                   >
-                    {record.ambulanceNumber}
+                    {record.vehicleno}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -92,10 +93,10 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                   <div className="whitespace-pre-line">{record.pumpLocation}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.gpsTime}</div>
+                  <div className="whitespace-pre-line">{record.created_at}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  ₹{record.softwareReadingTotalAmount}
+                  ₹{record.softwareReadingTotalAmount || 0}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
@@ -108,7 +109,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, onVehicleClick })
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {record.status}
+                  Pending
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StatusBadge status={record.status || 'ok'} />

@@ -5,7 +5,7 @@ import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
 
 export const useFuelData = () => {
   const fetchRequests = async () => {
-    const response = await axios.get(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/dashboard`);
+    const response = await axios.get(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record`);
     return response.data.ambulanceFuelLog;
   };
 
@@ -57,7 +57,6 @@ export const useFuelData = () => {
       totalAmount: 0,
       otp: r.otp,
       invoice: r.invoiceFileUrl,
-      status: r.status,
       // dateTime: formatDateTime(r.fuelDateTime),
       // rawTime: r.fuelDateTime,
     };

@@ -7,8 +7,6 @@ import ErrorDisplay from '@/components/FuelDetails/ErrorDisplay';
 import DashboardHeader from '@/components/FuelDetails/DashboardHeader';
 import SearchAndFilters from '@/components/FuelDetails/SearchAndFilters';
 import FuelTableComplete from '@/components/FuelDetails/FuelTableComplete';
-import SummaryStats from '@/components/FuelDetails/SummaryStats';
-import VehicleDetailModal from '@/components/FuelDetails/VehicleDetailModal';
 import { useFuelGraphData } from '@/hooks/useFuelGraphData';
 import FuelTablePending from './FuelTablePending';
 import FuelTableProcessing from './FuelTableProcessing';
@@ -17,76 +15,69 @@ import { useFuelAlerts } from '@/hooks/useFuelAlerts';
 export default function FuelDetailsDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedRecord, setSelectedRecord] = useState<FuelRecord | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [activeTab, setActiveTab] = useState<"Pending" | "Processing" | "Complete">("Pending");
 
   const { records, isLoading, isError, error, refetch } = useFuelData();
 
-  const { data: alertRecords = [], isLoading: alertsLoading } = useFuelAlerts();
+  const {
+  alerts: alertRecords,
+  isLoading: alertsLoading,
+  acceptAlert,
+  rejectAlert,
+} = useFuelAlerts();
+
   // For now, pick first sysServiceId to test (later you can loop all)
-  const sysServiceId = records.length > 0 ? records[0].sysServiceId : null;
-  const { data: graphData = [] } = useFuelGraphData(
-    sysServiceId,
-    "2025-08-03 00:00",
-    "2025-08-03 16:00"
-  );
+  // const sysServiceId = records.length > 0 ? records[0].sysServiceId : null;
+  // const { data: graphData = [] } = useFuelGraphData(
+  //   sysServiceId,
+  //   "2025-08-03 00:00",
+  //   "2025-08-03 16:00"
+  // );
 
-  // 🔹 Merge graph data with fuel records
-  const mergedRecords = useMemo(() => {
-    return records.map((rec) => {
-      const extra = graphData.find((g) => g.sysServiceId === rec.sysServiceId);
-      return {
-        ...rec,
-        gpsTime: extra?.gpsTime ?? null,
-        rv: extra?.rv ?? null,
-        fuelTypeGraph: extra?.fuelType ?? null,
-      };
-    });
-  }, [records, graphData]);
+  // // 🔹 Merge graph data with fuel records
+  // const mergedRecords = useMemo(() => {
+  //   return records.map((rec) => {
+  //     const extra = graphData.find((g) => g.sysServiceId === rec.sysServiceId);
+  //     return {
+  //       ...rec,
+  //       gpsTime: extra?.gpsTime ?? null,
+  //       rv: extra?.rv ?? null,
+  //       fuelTypeGraph: extra?.fuelType ?? null,
+  //     };
+  //   });
+  // }, [records, graphData]);
 
 
-  // 🔹 Filters (use merged records instead of records)
-  const filteredData = useMemo(() => {
-    return mergedRecords.filter((record: any) => {
-      const search = searchTerm.toLowerCase();
+  // // 🔹 Filters (use merged records instead of records)
+  // const filteredData = useMemo(() => {
+  //   return mergedRecords.filter((record: any) => {
+  //     const search = searchTerm.toLowerCase();
 
-      const matchesSearch =
-        record.ambulanceNumber.toString().toLowerCase().includes(search) ||
-        record.pumpLocation.toLowerCase().includes(search) ||
-        record.gpsTime?.toLowerCase().includes(search);
+  //     const matchesSearch =
+  //       record.ambulanceNumber.toString().toLowerCase().includes(search) ||
+  //       record.pumpLocation.toLowerCase().includes(search) ||
+  //       record.gpsTime?.toLowerCase().includes(search);
 
-      const recordDate = new Date(record.rawTime);
+  //     const recordDate = new Date(record.rawTime);
 
-      const matchesDate =
-        (!startDate || recordDate >= new Date(startDate)) &&
-        (!endDate || recordDate <= new Date(endDate));
+  //     const matchesDate =
+  //       (!startDate || recordDate >= new Date(startDate)) &&
+  //       (!endDate || recordDate <= new Date(endDate));
 
-      return matchesSearch && matchesDate;
-    });
-  }, [mergedRecords, searchTerm, startDate, endDate]);
+  //     return matchesSearch && matchesDate;
+  //   });
+  // }, [mergedRecords, searchTerm, startDate, endDate]);
 
   // 🔹 Split data into three
-  const pendingData = useMemo(() => alertRecords.filter((r) => r.status === "Pending"), [alertRecords]);
-  const processingData = useMemo(() => filteredData.filter((r) => r.status === "Processing"), [filteredData]);
-  console.log("procs",processingData)
-  const completeData = useMemo(() => filteredData.filter((r) => r.status === "Completed"), [filteredData]);
+  const pendingData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Pending"), [alertRecords]);
+  const processingData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Processing"), [alertRecords]);
+  const completeData = useMemo(() => alertRecords.filter((r) => r.statusText  === "Completed"), [alertRecords]);
 
   const handleExport = () => {
     console.log('Exporting data...');
     // Add export logic
-  };
-
-  const handleVehicleClick = (record: FuelRecord) => {
-    setSelectedRecord(record);
-    setIsDetailModalOpen(true);
-  };
-
-  const closeDetailModal = () => {
-    setIsDetailModalOpen(false);
-    setSelectedRecord(null);
   };
 
   if (isLoading) {
@@ -121,6 +112,8 @@ export default function FuelDetailsDashboard() {
         <FuelTablePending
           data={pendingData}
           onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
+          onAccept={acceptAlert}
+          onReject={rejectAlert}
           mode="pending"
         />
       )}
@@ -140,21 +133,6 @@ export default function FuelDetailsDashboard() {
           mode="complete"
         />
       )}
-
-        {/* Summary Stats */}
-        <SummaryStats data={filteredData} />
-
-        {/* Footer Info */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Showing {filteredData.length} of {records.length} records
-        </div>
-
-        {/* Vehicle Detail Modal */}
-        <VehicleDetailModal
-          isOpen={isDetailModalOpen}
-          record={selectedRecord}
-          onClose={closeDetailModal}
-        />
       </div>
     </div>
   );

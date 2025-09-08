@@ -1,33 +1,72 @@
 // hooks/useFuelAlerts.ts
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { FuelRecord } from "@/types/FuelRecord";
+import { PRODUCTION_API_ENDPOINT } from "@/utils/constants";
 
-const mapStatus = (num: number) => {
-  switch (num) {
-    case 0: return "Pending";
-    case 1: return "Processing";
-    case 2: return "Complete";
-    default: return "Unknown";
-  }
-};
-
-const fetchFuelAlerts = async (): Promise<FuelRecord[]> => {
-  const res = await axios.get("http://localhost:5001/api/v1/ambulance/fuel/alert/");
-  return (
-    res.data?.data?.map((r: any) => ({
-      ...r,
-      ambulanceNumber: r.vehicleno,
-      sysServiceId: r.sys_service_id,
-      gpsTime: r.created_at,
-      status: mapStatus(r.status),
-    })) || []
-  )
-};
+export interface FuelAlert {
+  id: number;
+  vehicleno: string;
+  msg: string;
+  status: number;
+  created_at: string;
+}
 
 export const useFuelAlerts = () => {
-  return useQuery<FuelRecord[], Error>({
+  const queryClient = useQueryClient();
+
+  const fetchAlerts = async (): Promise<FuelAlert[]> => {
+    const res = await axios.get(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/alert`);
+    return res.data.data.map((r: any) => {
+      // status mapping
+      let statusText: "Pending" | "Processing" | "Completed" = "Pending";
+      if (r.status === 1) statusText = "Processing";
+      if (r.status === 2) statusText = "Completed";
+
+      return {
+        ...r,
+        statusText,
+      };
+    });
+  };
+
+  function parseMsg(msg: string) {
+  // Example: "Ambulance DL1A3420 requested fueling at 3 E, ..., with 55.80L fuel"
+  const locationMatch = msg.match(/fueling at (.*?) with/);
+  const fuelMatch = msg.match(/with ([\d.]+)L fuel/);
+
+  return {
+    location: locationMatch ? locationMatch[1] : "",
+    requestedFuel: fuelMatch ? parseFloat(fuelMatch[1]) : 0,
+  };
+}
+
+
+  const { data = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ["fuelAlerts"],
-    queryFn: fetchFuelAlerts,
+    queryFn: fetchAlerts,
   });
+
+  // Accept mutation
+  const acceptMutation = useMutation({
+    mutationFn: (alertId: number) =>
+      axios.post(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/alert/${alertId}/accept`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fuelAlerts"] }),
+  });
+
+  // Reject mutation
+  const rejectMutation = useMutation({
+    mutationFn: (alertId: number) =>
+      axios.post(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/alert/${alertId}/reject`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fuelAlerts"] }),
+  });
+
+  return {
+    alerts: data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    acceptAlert: acceptMutation.mutate,
+    rejectAlert: rejectMutation.mutate,
+  };
 };
