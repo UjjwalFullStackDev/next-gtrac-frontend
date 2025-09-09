@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, Timer } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
 import { FuelDataModal } from './popupTableComponents/FuelDataModel';
 import { truncateAddress } from '@/utils/truncateAddress';
@@ -45,28 +45,28 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                   <div>(App) Reading</div>
                 </div>
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Difference
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Pump Location
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Date
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Total Amount
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 OTP
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Invoice
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Status
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Report
               </th>
             </tr>
@@ -110,10 +110,10 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                   <div className="whitespace-pre-line">{record.fuelDate}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                   ₹{record.softwareReadingTotalAmount || 0}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
                     {record.otp}
                   </span>
@@ -124,7 +124,10 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  Pending
+                  <div className='flex gap-1 justify-center items-center w-full px-2 py-1 rounded-xl text-xs font-medium bg-orange-100 text-orange-600 cursor-pointer'>
+                    <Timer className="w-3 h-3" />
+                    Processing
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {record.auditStatus === 'Audit' ? (
