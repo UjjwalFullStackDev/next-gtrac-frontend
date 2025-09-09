@@ -4,9 +4,11 @@ import { FileText, X, RefreshCw } from 'lucide-react';
 import { Pill } from './ui/Pill';
 import axios from 'axios';
 import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
+import { FuelDataModalProps } from '@/types/FuelDataModalProps'
+import { truncateAddress } from '@/utils/truncateAddress';
 
 
-export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
+export const FuelDataModal: React.FC<FuelDataModalProps>= ({ isOpen, onClose, record, refresh }) => {
   const [otp, setOtp] = useState("");
   const [payment, setPayment] = useState("Cash");
   const [amount, setAmount] = useState("");
@@ -25,23 +27,23 @@ export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
     }
     
     const payload = {
-    alertBankId: record.alertBankId,
-    fuelLogId: record.id, 
-    vehicleno: record.vehicleno,
-    location: record.location,
-    requestedFuel: record.requestedFuel, //current fuel
-    quantityReading: record.quantityReading,  // from record invoice
-    liveFuel: record.liveFuel,  // by gps
-    fuelDifference: record.fuelDifference,
+    alertBankId: record?.alertBankId,
+    fuelLogId: record?.id, 
+    vehicleno: record?.vehicleno,
+    location: record?.location,
+    requestedFuel: record?.requestedFuel, //current fuel
+    quantityReading: record?.quantityReading,  // from record invoice
+    liveFuel: record?.liveFuel,  // by gps
+    fuelDifference: record?.fuelDifference,
     status,
     otp,
     paymentMode: payment,
     amount,
-    softwareReadingTotalAmount: record.softwareReadingTotalAmount,
-    invoiceFileUrl: record.invoice,
+    softwareReadingTotalAmount: record?.softwareReadingTotalAmount,
+    invoiceFileUrl: record?.invoice,
     gpsTime: new Date().toISOString()
   };
-  console.log("payload", payload)
+
   try {
     await axios.post(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/completed`, payload);
     alert("Transaction submitted successfully!");
@@ -63,7 +65,7 @@ export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-blue-600">
           <div className="text-white">
             <h2 className="text-2xl font-bold">Fuel Transaction Details</h2>
             <p className="text-indigo-100">Vehicle: {record.vehicleno}</p>
@@ -128,7 +130,7 @@ export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
                     <div className="font-semibold text-gray-900">{record.vehicleno}</div>
                   </td>
                   <td className="px-4 py-4 max-w-[220px]">
-                    <div className="text-sm text-gray-900 whitespace-pre-line">{record.location || "-"}</div>
+                    <div className="text-sm text-gray-900 whitespace-pre-line">{truncateAddress(record.location) || "-"}</div>
                   </td>
                   <td className="px-4 py-4">
                     <Pill>{record.requestedFuel || 0} L</Pill>
@@ -184,7 +186,7 @@ export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
                       disabled={!record?.invoice}
                       className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-md
                     ${record?.invoice
-                          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 cursor-pointer"
+                          ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"}
                       `}
                     >

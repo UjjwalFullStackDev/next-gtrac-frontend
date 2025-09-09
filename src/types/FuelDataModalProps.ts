@@ -1,10 +1,8 @@
 import { FuelRecord } from "./FuelRecord";
 
-interface FuelDataModalProps {
+export interface FuelDataModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAccept: () => void;
-  onReject: () => void;
   record: FuelRecord | null;
   refresh: () => void;
 }

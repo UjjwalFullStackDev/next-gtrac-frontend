@@ -24,7 +24,6 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
       const response = await axios.get(
         `${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/completed/all`
       );
-      console.log(response.data.data)
       return response.data.data;
     },
   });
@@ -41,7 +40,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
 
-  const sortedData = data?.slice().sort((a, b) => b.id - a.id);
+  const sortedData = (data ?? []).sort((a, b) => b.id - a.id);
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">
@@ -125,7 +124,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                   <div className="whitespace-pre-line">{truncateAddress(record.location) || "-"}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{formatDate(record?.gpsTime)}</div>
+                  <div className="whitespace-pre-line">{formatDate(record.gpsTime || undefined)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₹{record.amount}
@@ -138,7 +137,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <button className="text-blue-600 hover:text-blue-800">
                     <a
-                      href={record.invoiceFileUrl} // URL of invoice
+                      href={record.invoiceFileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -147,10 +146,12 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {record.status}
+                  <div className='w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-700 text-white cursor-pointer'>
+                  Completed
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {record.auditStatus === 'Audit' ? (
+                  {record.status === 'Audit' ? (
                     <span className="inline-flex items-center justify-center w-full px-6 py-1 rounded-md text-xs font-medium bg-red-700 text-white cursor-pointer">
                       Audit
                     </span>

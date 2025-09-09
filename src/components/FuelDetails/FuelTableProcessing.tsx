@@ -18,7 +18,6 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
   const handleVehicleClick = (record:FuelRecord) => {
     setSelectedRecord(record);
     setIsModalOpen(true);
-    console.log("Vehicle clicked:", record);
   };
 
   const closeModal = () => {

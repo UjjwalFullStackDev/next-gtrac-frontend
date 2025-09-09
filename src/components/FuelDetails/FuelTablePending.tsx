@@ -18,9 +18,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
   data,
   onAccept,
   onReject,
-  refresh,
-  onVehicleClick, 
-  mode 
+  refresh, 
 }) => {
     const [selectedRecord, setSelectedRecord] = useState<FuelRecord | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +31,6 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
 
   const handleReject = (record:FuelRecord) => {
     onReject?.(record.id);
-    console.log("Rejected:", record);
   };
 
   const closeModal = () => {
