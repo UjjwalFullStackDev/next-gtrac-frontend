@@ -5,10 +5,9 @@ import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
 
 export const useFuelData = () => {
   const fetchRequests = async () => {
-    const response = await axios.get(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/dashboard`);
+    const response = await axios.get(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record`);
     return response.data.ambulanceFuelLog;
   };
-
   const { data:fuelLogs = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ['fuelLogs'],
     queryFn: fetchRequests,
@@ -45,6 +44,7 @@ export const useFuelData = () => {
     return {
       id: r.id,
       sysServiceId: r.ambulance.sysServiceId,
+      alertBankId: r.alertBankId,
       ambulanceNumber: r.ambulance.ambulanceNumber,
       vehicle: r.ambulanceId,
       fuelStatus: r.fuelType,
@@ -57,9 +57,6 @@ export const useFuelData = () => {
       totalAmount: 0,
       otp: r.otp,
       invoice: r.invoiceFileUrl,
-      status: r.status,
-      // dateTime: formatDateTime(r.fuelDateTime),
-      // rawTime: r.fuelDateTime,
     };
   });
 

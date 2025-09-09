@@ -1,4 +1,3 @@
-// DashboardHeader.tsx
 import React from "react";
 
 interface DashboardHeaderProps {
@@ -14,7 +13,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, onTabChang
   ];
 
   return (
-    <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+    <div className="flex flex-col justify-between gap-2">
       {/* Heading */}
       <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Fuel Details</h1>
 
@@ -24,7 +23,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, onTabChang
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition 
+            className={`px-4 py-1 rounded-lg text-sm font-medium transition 
               ${
                 activeTab === tab
                   ? "bg-blue-600 text-white shadow"

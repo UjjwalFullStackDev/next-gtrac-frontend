@@ -1,6 +1,7 @@
 export interface FuelGraphRecord {
   sysServiceId: string;
   gpsTime: string;
-  rv: number;
   fuelType: string;
+  liveFuel: number | null;
+  statusText?: string;
 }
