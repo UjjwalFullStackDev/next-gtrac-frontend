@@ -1,18 +1,19 @@
 export interface FuelRecord {
   id: number;
-  sysServiceId: string;
-  ambulanceNumber: string;
-  vehicle: string;
-  fuelStatus: string;
-  currentReading: number;
-  quantityReading: number;
-  appQuantityReading: number;
+  sysServiceId?: string;
+  alertBankId?: number;
+  ambulanceNumber?: string;
+  vehicle?: string;
+  fuelStatus?: string;
+  currentReading?: number;
+  quantityReading?: number;
+  appQuantityReading?: number;
   fuelDifference: number;
-  pumpLocation: string;
-  totalAmount: number;
-  otp: string;
-  invoice: string;
-  status?: 'audit' | 'ok';
+  pumpLocation?: string;
+  totalAmount?: number;
+  otp?: string;
+  invoice?: string;
+  auditStatus?: 'Audit' | 'OK';
   timestamp?: string;
   previousReading?: number;
   efficiency?: string;
@@ -20,5 +21,16 @@ export interface FuelRecord {
   driverName?: string;
   dateTime?: string;
   rawTime?: string;
-  softwareReadingTotalAmount?: string,
+  softwareReadingTotalAmount?: string;
+  vehicleno?: string;
+  requestedFuel?: string;
+  location?: string;
+  fuelDate?: string;
+  liveFuel?: number | null;
+  gpsTime?: string | null;
+  amount?: number;
+  invoiceFileUrl?: string;
+  status?: string;
+  statusText?: string;
+  created_at?: string;
 }

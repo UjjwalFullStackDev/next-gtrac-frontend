@@ -116,7 +116,7 @@ const VehicleDetailModal: React.FC<VehicleDetailModalProps> = ({ isOpen, record,
               </div>
               
               <div className="text-center p-4 bg-cyan-50 rounded-lg border border-cyan-200">
-                <div className="text-2xl font-bold text-cyan-700">{record.rv}L</div>
+                <div className="text-2xl font-bold text-cyan-700">L</div>
                 <div className="text-sm text-cyan-600 font-medium">Software Reading</div>
                 <div className="text-xs text-gray-500 mt-1">System measurement</div>
               </div>

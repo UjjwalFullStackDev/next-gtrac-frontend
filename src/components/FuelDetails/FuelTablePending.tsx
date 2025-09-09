@@ -1,31 +1,38 @@
 'use client'
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
 import { FuelDataModal } from './popupTableComponents/FuelDataModel';
+import { truncateAddress } from '@/utils/truncateAddress';
 
 interface FuelTableProps {
   data: FuelRecord[];
+  onAccept?: (id: number) => void;
+  onReject?: (id: number) => void;
+  refresh: () => void;
   onVehicleClick: (record: FuelRecord) => void;
+  mode: "pending" | "processing" | "complete"; 
 }
 
 const FuelTablePending: React.FC<FuelTableProps> = ({
   data,
   onAccept,
   onReject,
-  refresh
+  refresh,
+  onVehicleClick, 
+  mode 
 }) => {
-    const [selectedRecord, setSelectedRecord] = useState(null);
+    const [selectedRecord, setSelectedRecord] = useState<FuelRecord | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAccept = (record) => {
+  const handleAccept = (record:FuelRecord) => {
     setSelectedRecord(record);
-    onAccept(record.id);
+    onAccept?.(record.id);
     setIsModalOpen(true);
   };
 
-  const handleReject = (record) => {
-    onReject(record.id);
+  const handleReject = (record:FuelRecord) => {
+    onReject?.(record.id);
     console.log("Rejected:", record);
   };
 
@@ -36,9 +43,9 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex-1 overflow-y-scroll no-scrollbar relative">
+      <div className="h-[70vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
-          <thead className="sticky -top-1 bg-gray-100 z-10">
+          <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Ambulance No
@@ -112,7 +119,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.location || "-"}</div>
+                  <div className="whitespace-pre-line">{truncateAddress(record.location) || "-"}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                   <div className="whitespace-pre-line">{record.fuelDate}</div>
@@ -131,7 +138,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                   </button>
                 </td>
 
-                {/* ✅ Actions Column */}
+                {/* Actions Column */}
                 <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                   <button
                     onClick={() => handleAccept(record)}

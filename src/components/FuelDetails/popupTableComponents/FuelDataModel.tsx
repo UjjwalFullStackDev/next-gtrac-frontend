@@ -6,17 +6,16 @@ import axios from 'axios';
 import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
 
 
-export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
+export const FuelDataModal= ({ isOpen, onClose, record, refresh }) => {
   const [otp, setOtp] = useState("");
   const [payment, setPayment] = useState("Cash");
   const [amount, setAmount] = useState("");
 
-  const invoiceUrl = record?.invoice || null;
-  const invoiceReady = !!invoiceUrl;
 
   const handleRefresh = () => {
     // just trigger parent refresh (no API call here)
     if (refresh) refresh();
+    console.log('refresh')
   };
 
   const handleSubmit = async () => {
@@ -26,27 +25,27 @@ export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
     }
     
     const payload = {
-    alertBankId: record.id,
+    alertBankId: record.alertBankId,
     fuelLogId: record.id, 
     vehicleno: record.vehicleno,
     location: record.location,
-    requestedFuel: record.requestedFuel,
-    quantityReading: record.quantityReading,
-    liveFuel: record.liveFuel,
+    requestedFuel: record.requestedFuel, //current fuel
+    quantityReading: record.quantityReading,  // from record invoice
+    liveFuel: record.liveFuel,  // by gps
     fuelDifference: record.fuelDifference,
-    status: 'OK',
+    status,
     otp,
     paymentMode: payment,
     amount,
     softwareReadingTotalAmount: record.softwareReadingTotalAmount,
     invoiceFileUrl: record.invoice,
-    gpsTime: record.gpsTime,
+    gpsTime: new Date().toISOString()
   };
-  
+  console.log("payload", payload)
   try {
     await axios.post(`${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/completed`, payload);
     alert("Transaction submitted successfully!");
-    if (refresh) refresh(); // refresh parent list
+    if (refresh) refresh();
     onClose();
   } catch (err) {
     console.error("Submit failed", err);
@@ -67,7 +66,7 @@ export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-indigo-500 to-purple-600">
           <div className="text-white">
             <h2 className="text-2xl font-bold">Fuel Transaction Details</h2>
-            <p className="text-indigo-100">Vehicle: {record.vehicleno || vehicleno}</p>
+            <p className="text-indigo-100">Vehicle: {record.vehicleno}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -76,9 +75,9 @@ export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
               <RefreshCw className="w-4 h-4" />
               Refresh
             </button>
-            {invoiceUrl ? (
+            {record?.invoice ? (
               <a
-                href={invoiceUrl}
+                href={record?.invoice}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-black px-4 py-2 rounded-lg transition-all duration-200"
@@ -182,9 +181,9 @@ export const FuelDataModal = ({ isOpen, onClose, record, refresh }) => {
                   <td className="px-4 py-4">
                     <button
                       onClick={handleSubmit}
-                      disabled={!invoiceReady}
+                      disabled={!record?.invoice}
                       className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-md
-                    ${invoiceReady
+                    ${record?.invoice
                           ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 cursor-pointer"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"}
                       `}

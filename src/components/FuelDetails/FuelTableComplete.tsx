@@ -4,10 +4,16 @@ import { FuelRecord } from '@/types/FuelRecord';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { PRODUCTION_API_ENDPOINT } from '@/utils/constants';
+import { truncateAddress } from '@/utils/truncateAddress';
 
 
 interface FuelTableProps {
+  data: FuelRecord[];
   onVehicleClick: (record: FuelRecord) => void;
+  mode: "pending" | "processing" | "complete";
+  onAccept?: (id: number) => void;
+  onReject?: (id: number) => void;
+  refresh?: () => void;
 }
 
 const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
@@ -19,7 +25,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
         `${PRODUCTION_API_ENDPOINT}/ambulance/fuel/record/completed/all`
       );
       console.log(response.data.data)
-      return response.data.data; // assuming your API returns { data: [...] }
+      return response.data.data;
     },
   });
 
@@ -27,7 +33,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
   if (!isoString) return "-";
   const date = new Date(isoString);
   const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // months are 0-indexed
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
@@ -35,6 +41,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching data</div>;
 
+  const sortedData = data?.slice().sort((a, b) => b.id - a.id);
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="flex-1 overflow-y-scroll no-scrollbar relative">
@@ -82,7 +89,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data.map((record: FuelRecord) => (
+            {sortedData.map((record: FuelRecord) => (
               <tr key={record.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <button
@@ -115,10 +122,10 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.location || "-"}</div>
+                  <div className="whitespace-pre-line">{truncateAddress(record.location) || "-"}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{formatDate(record.gpsTime)}</div>
+                  <div className="whitespace-pre-line">{formatDate(record?.gpsTime)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₹{record.amount}

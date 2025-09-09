@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
-import StatusBadge from './StatusBadge';
 import { FuelDataModal } from './popupTableComponents/FuelDataModel';
+import { truncateAddress } from '@/utils/truncateAddress';
 
 interface FuelTableProps {
   data: FuelRecord[];
+  refresh: () => void;
   onVehicleClick: (record: FuelRecord) => void;
+  mode: "pending" | "processing" | "complete";
 }
 
 const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
-  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState<FuelRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log("data", data)
-  const handleVehicleClick = (record) => {
+
+  const handleVehicleClick = (record:FuelRecord) => {
     setSelectedRecord(record);
     setIsModalOpen(true);
     console.log("Vehicle clicked:", record);
@@ -104,7 +106,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                  <div className="whitespace-pre-line">{record.location}</div>
+                  <div className="whitespace-pre-line">{truncateAddress(record.location)}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                   <div className="whitespace-pre-line">{record.fuelDate}</div>

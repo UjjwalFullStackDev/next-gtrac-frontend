@@ -37,16 +37,16 @@ export default function FuelDetailsDashboard() {
   }
 
   // set status based on >2% diff
-  const auditStatus = Math.abs(fuelDifference) > 2 ? "Audit" : "OK";
+  const auditStatus: "Audit" | "OK" = Math.abs(fuelDifference) > 2 ? "Audit" : "OK";
 
   return {
     ...alert,
-    ...log, // ✅ log should come after alert so invoiceFileUrl isn’t lost
+    ...log,
     liveFuel: graph ? Math.round(graph.fuel) : null,
     gpsTime: graph ? graph.gpsTime : null,
     fuelDifference: Math.round(fuelDifference * 100) / 100,
+    status: String(alert.status),
     auditStatus,
-    invoiceFileUrl: log?.invoiceFileUrl ?? null, // ✅ explicitly safe
   };
 });
 
