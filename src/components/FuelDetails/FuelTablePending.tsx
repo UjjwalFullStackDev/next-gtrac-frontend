@@ -40,7 +40,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="h-[70vh] overflow-y-auto custom-scrollbar">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>

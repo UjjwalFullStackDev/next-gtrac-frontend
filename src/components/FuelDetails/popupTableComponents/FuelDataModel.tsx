@@ -65,7 +65,7 @@ export const FuelDataModal: React.FC<FuelDataModalProps>= ({ isOpen, onClose, re
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-blue-600">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-blue-500">
           <div className="text-white">
             <h2 className="text-2xl font-bold">Fuel Transaction Details</h2>
             <p className="text-indigo-100">Vehicle: {record.vehicleno}</p>
@@ -186,7 +186,7 @@ export const FuelDataModal: React.FC<FuelDataModalProps>= ({ isOpen, onClose, re
                       disabled={!record?.invoice}
                       className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-md
                     ${record?.invoice
-                          ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                          ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer ease-in"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"}
                       `}
                     >

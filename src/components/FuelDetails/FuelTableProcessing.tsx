@@ -27,9 +27,9 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex-1 overflow-y-scroll no-scrollbar relative">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
-          <thead className="sticky -top-1 bg-gray-100 z-10">
+          <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Ambulance No
@@ -77,7 +77,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <button
                     onClick={() => handleVehicleClick(record)}
-                    className="text-black-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    className="text-black-600 hover:text-blue-500 hover:underline cursor-pointer"
                   >
                     {record.vehicleno}
                   </button>
@@ -100,7 +100,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center justify-center w-14 h-6 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {record.fuelDifference}%
                   </span>
                 </td>
@@ -114,12 +114,12 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                   ₹{record.softwareReadingTotalAmount || 0}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
+                  <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-500 rounded text-sm font-medium">
                     {record.otp}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <button className="text-blue-600 hover:text-blue-800">
+                  <button className="text-blue-500 hover:text-blue-600">
                     <FileText className="w-5 h-5" />
                   </button>
                 </td>
@@ -135,7 +135,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                       Audit
                     </span>
                   ) : (
-                    <span className="inline-flex items-center justify-center w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-700 text-white cursor-pointer">
+                    <span className="inline-flex items-center justify-center w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-500 text-white cursor-pointer">
                       Ok
                     </span>
                   )}

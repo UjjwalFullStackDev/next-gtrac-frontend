@@ -42,9 +42,9 @@ const FuelTableComplete: React.FC<FuelTableProps> = () => {
   const sortedData = (data ?? []).sort((a, b) => b.id - a.id);
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex-1 overflow-y-scroll no-scrollbar relative">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
-          <thead className="sticky -top-1 bg-gray-100 z-10">
+          <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Ambulance No
@@ -112,7 +112,7 @@ const FuelTableComplete: React.FC<FuelTableProps> = () => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center justify-center w-14 h-6 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {record.fuelDifference}%
                   </span>
                 </td>
