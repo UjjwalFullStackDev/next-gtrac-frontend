@@ -40,39 +40,39 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="h-[70vh] overflow-y-auto custom-scrollbar">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Ambulance No
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Status
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700 flex items-center divide-x divide-gray-300">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700 flex items-center divide-x divide-gray-300">
                 <div className="text-center px-2">(Soft) Reading</div>
                 <div className="text-center px-2">(App) Reading</div>
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Difference
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Pump Location
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Date
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Total Amount
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 OTP
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Invoice
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Actions
               </th>
             </tr>
@@ -111,7 +111,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center justify-center w-14 h-6 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {record.fuelDifference}%
                   </span>
                 </td>
@@ -121,10 +121,10 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                   <div className="whitespace-pre-line">{record.fuelDate}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  ₹{record.softwareReadingTotalAmount || 0}
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
+                  ₹ 0
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
                     {record.otp}
                   </span>
@@ -136,7 +136,7 @@ const FuelTablePending: React.FC<FuelTableProps> = ({
                 </td>
 
                 {/* Actions Column */}
-                <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                <td className="px-6 py-4 whitespace-nowrap flex justify-center gap-2">
                   <button
                     onClick={() => handleAccept(record)}
                     className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"

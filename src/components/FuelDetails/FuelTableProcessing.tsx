@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileText, Timer } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
 import { FuelDataModal } from './popupTableComponents/FuelDataModel';
 import { truncateAddress } from '@/utils/truncateAddress';
@@ -27,9 +27,9 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex-1 overflow-y-scroll no-scrollbar relative">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
-          <thead className="sticky -top-1 bg-gray-100 z-10">
+          <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Ambulance No
@@ -45,28 +45,28 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                   <div>(App) Reading</div>
                 </div>
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Difference
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Pump Location
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Date
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Total Amount
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 OTP
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Invoice
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Status
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Report
               </th>
             </tr>
@@ -77,7 +77,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   <button
                     onClick={() => handleVehicleClick(record)}
-                    className="text-black-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    className="text-black-600 hover:text-blue-500 hover:underline cursor-pointer"
                   >
                     {record.vehicleno}
                   </button>
@@ -100,7 +100,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center justify-center w-14 h-6 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {record.fuelDifference}%
                   </span>
                 </td>
@@ -110,21 +110,24 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                   <div className="whitespace-pre-line">{record.fuelDate}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                   ₹{record.softwareReadingTotalAmount || 0}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-500 rounded text-sm font-medium">
                     {record.otp}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <button className="text-blue-600 hover:text-blue-800">
+                  <button className="text-blue-500 hover:text-blue-600">
                     <FileText className="w-5 h-5" />
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  Pending
+                  <div className='flex gap-1 justify-center items-center w-full px-2 py-1 rounded-xl text-xs font-medium bg-orange-100 text-orange-600 cursor-pointer'>
+                    <Timer className="w-3 h-3" />
+                    Processing
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {record.auditStatus === 'Audit' ? (
@@ -132,7 +135,7 @@ const FuelTableProcessing: React.FC<FuelTableProps> = ({ data, refresh }) => {
                       Audit
                     </span>
                   ) : (
-                    <span className="inline-flex items-center justify-center w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-700 text-white cursor-pointer">
+                    <span className="inline-flex items-center justify-center w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-500 text-white cursor-pointer">
                       Ok
                     </span>
                   )}

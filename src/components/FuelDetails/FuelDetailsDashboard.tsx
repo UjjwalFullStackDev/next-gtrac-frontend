@@ -13,7 +13,6 @@ import { useFuelAlerts } from '@/hooks/useFuelAlerts';
 
 export default function FuelDetailsDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [activeTab, setActiveTab] = useState<"Pending" | "Processing" | "Complete">("Pending");
@@ -50,14 +49,57 @@ export default function FuelDetailsDashboard() {
   };
 });
 
+
+const filteredData = useMemo(() => {
+  return merged.filter(r => {
+    // search filter (Username, vehicleno, location, msg)
+    const matchesSearch =
+      !searchTerm ||
+      r.Username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.vehicleno?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.msg?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // date filter (use created_at or fuelDate)
+    const recordDate = r.created_at ? new Date(r.created_at) : null;
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate + "T23:59:59") : null;
+
+    const matchesDate =
+      (!start || (recordDate && recordDate >= start)) &&
+      (!end || (recordDate && recordDate <= end));
+
+    return matchesSearch && matchesDate;
+  });
+}, [merged, searchTerm, startDate, endDate]);
+
+
   // 🔹 Split data into three
-  const pendingData = useMemo(() => merged.filter((r) => r.statusText  === "Pending"), [merged]);
-  const processingData = useMemo(() => merged.filter((r) => r.statusText  === "Processing"), [merged]);
-  const completeData = useMemo(() => merged.filter((r) => r.statusText  === "Completed"), [merged]);
+  const pendingData = useMemo(() => filteredData.filter((r) => r.statusText  === "Pending"), [filteredData]);
+  const processingData = useMemo(() => filteredData.filter((r) => r.statusText  === "Processing"), [filteredData]);
+  const completeData = useMemo(() => filteredData.filter((r) => r.statusText  === "Completed"), [filteredData]);
 
   const handleExport = () => {
-    console.log('Exporting data...');
-    // Add export logic
+    const headers = ["vehicleno","location","fuelDate","statusText","auditStatus","fuelDifference"];
+    const rows = filteredData.map(r => [
+      r.vehicleno ?? "",
+      r.location ?? "",
+      r.fuelDate ?? "",
+      r.statusText ?? "",
+      r.auditStatus ?? "",
+      r.fuelDifference ?? ""
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "fuel_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (isLoading) {
@@ -111,7 +153,6 @@ export default function FuelDetailsDashboard() {
       {activeTab === "Complete" && (
         <FuelTableComplete
           data={completeData}
-          onVehicleClick={(record) => console.log("Vehicle clicked:", record)}
           mode="complete"
         />
       )}

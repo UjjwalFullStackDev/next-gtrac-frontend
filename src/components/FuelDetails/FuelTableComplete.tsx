@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText } from 'lucide-react';
+import { CheckCheck, FileText } from 'lucide-react';
 import { FuelRecord } from '@/types/FuelRecord';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -9,14 +9,13 @@ import { truncateAddress } from '@/utils/truncateAddress';
 
 interface FuelTableProps {
   data: FuelRecord[];
-  onVehicleClick: (record: FuelRecord) => void;
   mode: "pending" | "processing" | "complete";
   onAccept?: (id: number) => void;
   onReject?: (id: number) => void;
   refresh?: () => void;
 }
 
-const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
+const FuelTableComplete: React.FC<FuelTableProps> = () => {
 
   const { data, isLoading, error } = useQuery<FuelRecord[]>({
     queryKey: ["completedFuelTransactions"],
@@ -43,9 +42,9 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
   const sortedData = (data ?? []).sort((a, b) => b.id - a.id);
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex-1 overflow-y-scroll no-scrollbar relative">
+      <div className="h-[72vh] overflow-y-auto custom-scrollbar">
         <table className="w-full border-collapse">
-          <thead className="sticky -top-1 bg-gray-100 z-10">
+          <thead className="sticky top-0 bg-gray-50 z-20">
             <tr>
               <th className="p-3 text-left font-semibold text-sm text-gray-700">
                 Ambulance No
@@ -61,28 +60,28 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                   <div>(App) Reading</div>
                 </div>
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Difference
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Fuel Pump Location
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Date
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Total Amount
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 OTP
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Invoice
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Status
               </th>
-              <th className="p-3 text-left font-semibold text-sm text-gray-700">
+              <th className="p-3 text-center font-semibold text-sm text-gray-700">
                 Report
               </th>
             </tr>
@@ -91,10 +90,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
             {sortedData.map((record: FuelRecord) => (
               <tr key={record.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <button
-                    onClick={() => onVehicleClick(record)}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
-                  >
+                  <button className="text-black">
                     {record.vehicleno}
                   </button>
                 </td>
@@ -116,7 +112,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="inline-flex items-center justify-center w-14 h-6 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                     {record.fuelDifference}%
                   </span>
                 </td>
@@ -129,7 +125,7 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₹{record.amount}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
                     {record.otp}
                   </span>
@@ -146,7 +142,8 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className='w-full px-3 py-1 rounded-md text-xs font-medium bg-blue-700 text-white cursor-pointer'>
+                  <div className='flex gap-1 w-full px-3 py-1 rounded-xl text-xs font-medium bg-green-100 text-green-600 cursor-pointer'>
+                    <CheckCheck className="w-4 h-4" />
                   Completed
                   </div>
                 </td>
@@ -170,4 +167,4 @@ const FuelTable: React.FC<FuelTableProps> = ({ onVehicleClick }) => {
   );
 };
 
-export default FuelTable;
+export default FuelTableComplete;

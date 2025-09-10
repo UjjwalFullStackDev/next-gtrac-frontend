@@ -26,7 +26,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ activeTab, onTabChang
             className={`px-4 py-1 rounded-lg text-sm font-medium transition 
               ${
                 activeTab === tab
-                  ? "bg-blue-600 text-white shadow"
+                  ? "bg-blue-500 text-white shadow"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
           >
